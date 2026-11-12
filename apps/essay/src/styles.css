@@ -97,3 +97,21 @@ section.chapter p { color: color-mix(in oklab, var(--fg) 88%, var(--muted)); }
 button.ghost { background: transparent; color: var(--fg); border: 1px solid color-mix(in oklab, var(--fg) 24%, transparent); }
 button:disabled { opacity: 0.45; cursor: default; }
 .detector-verdict { margin-top: 14px; padding: 12px 14px; border-radius: 10px; background: color-mix(in oklab, var(--accent) 10%, transparent); color: var(--fg); font-size: 15px; }
+
+/* --- §5 catalogue --- */
+.cat-lead { color: var(--muted); font-size: 15px; }
+.cat-group { border: 1px solid color-mix(in oklab, var(--fg) 12%, transparent); border-radius: 10px; margin-bottom: 8px; overflow: hidden; }
+.cat-group.open { border-color: color-mix(in oklab, var(--accent) 35%, transparent); }
+.cat-head { width: 100%; display: flex; align-items: center; gap: 10px; background: transparent; color: var(--fg); border: none; border-radius: 0; padding: 12px 14px; text-align: left; }
+.cat-dot { width: 11px; height: 11px; border-radius: 3px; flex: none; }
+.cat-title { font-weight: 600; }
+.cat-cn { color: var(--muted); font-size: 13px; flex: 1; }
+.cat-count { color: var(--muted); font-size: 13px; font-variant-numeric: tabular-nums; }
+.cat-body { padding: 0 14px 14px 35px; }
+.cat-what { color: color-mix(in oklab, var(--fg) 85%, var(--muted)); font-size: 14.5px; margin: 0 0 10px; }
+.cat-names { display: flex; flex-wrap: wrap; gap: 6px; }
+.cat-names code { font-size: 12px; background: color-mix(in oklab, var(--fg) 7%, transparent); padding: 2px 7px; border-radius: 5px; color: var(--muted); }
+.cat-names code.name-death { color: var(--danger); background: color-mix(in oklab, var(--danger) 12%, transparent); }
+code { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 0.9em; }
+
+code.inline-death { color: var(--danger); }

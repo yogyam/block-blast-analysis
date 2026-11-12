@@ -1,0 +1,1 @@
+{"games":1200,"agents":["random","greedy","beam"],"dealers":["fair","real"],"data":{"random":{"fair":{"meanScore":62,"meanLength":4.4},"real":{"meanScore":101,"meanLength":6.3}},"greedy":{"fair":{"meanScore":305,"meanLength":11.3},"real":{"meanScore":658,"meanLength":23.1}},"beam":{"fair":{"meanScore":823,"meanLength":25.9},"real":{"meanScore":1018,"meanLength":34.1}}}}
