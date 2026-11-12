@@ -102,7 +102,7 @@ export function DealerDetector() {
           Dealer {round.riggedSide.toUpperCase()} was rigged.{' '}
           {(() => {
             const at = caughtAt(round.riggedSide === 'a' ? round.a : round.b);
-            return at ? `The detector flagged it after ${at} hands.` : `In this run it stayed under the line — a weak effect needs more hands (see the power curve).`;
+            return at ? `The detector flagged it after ${at} hands.` : `In this run it stayed under the line. A weak effect takes more hands to catch.`;
           })()}{' '}
           The fair dealer never crossed.
         </p>

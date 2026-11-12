@@ -6,12 +6,12 @@
 interface Milestone { readonly year: string; readonly title: string; readonly detail: string; readonly here?: boolean; }
 
 const MILESTONES: readonly Milestone[] = [
-  { year: '2004', title: 'Hamlet (Hunicke & Chapman)', detail: 'DDA’s canonical system watches the player, predicts an "undesirable but avoidable state", and intervenes "just enough" — with a policy to help and a policy to hinder, preferring changes the player cannot see.' },
+  { year: '2004', title: 'Hamlet (Hunicke & Chapman)', detail: 'DDA’s canonical system watches the player, predicts an "undesirable but avoidable state", and intervenes "just enough". It has a policy to help and a policy to hinder, and prefers changes the player cannot see.' },
   { year: '2014', title: 'Wooga, "FUUU factor" (GDC)', detail: 'A published recipe for manufacturing near-misses: "blocking levels" with lose rates up to 95%, a first one in the first session, because "players need to lose, and lose early".' },
-  { year: '2016', title: 'EA patent US 9,919,217 B2', detail: 'Predict a player’s churn, then "select a seed value" for the game’s random number generator based on it — with "undetectable by the user" stated as a design goal.' },
+  { year: '2016', title: 'EA patent US 9,919,217 B2', detail: 'Predict a player’s churn, then "select a seed value" for the game’s random number generator based on it. "Undetectable by the user" is stated as a design goal.' },
   { year: '2017', title: 'EOMM (Chen et al., EA)', detail: 'A paper argues that creating fair games "is not optimal for engagement", and proposes optimizing matchmaking for predicted engagement instead.' },
   { year: '2025', title: 'Pape et al., personalized difficulty', detail: 'A peer-reviewed economics paper estimates that personalizing difficulty per player raises revenue by about 71% over an already revenue-maximized baseline.' },
-  { year: '2026', title: 'Block Blast', detail: 'The three pieces, chosen by a hundred named strategies, gated by a server that also runs an ad-value model and a churn model. Measured here. The novelty is not that it adapts — it is what it adapts for.', here: true },
+  { year: '2026', title: 'Block Blast', detail: 'The three pieces, chosen by a hundred named strategies, gated by a server that also runs an ad-value model and a churn model. Measured here. The novelty is not that it adapts. It is what it adapts for.', here: true },
 ];
 
 export function Timeline() {

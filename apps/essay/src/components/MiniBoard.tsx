@@ -122,9 +122,9 @@ export function MiniBoard() {
       </div>
       <div className="mb-controls">
         {state.gameOver ? (
-          <span className="mb-over">No move left — dealt out after {state.turn + 1} hands, {state.score} points.</span>
+          <span className="mb-over">No move left. Dealt out after {state.turn + 1} hands, {state.score} points.</span>
         ) : (
-          <span className="mb-hint">Pick a piece, then click the board — its top-left lands where you click.</span>
+          <span className="mb-hint">Pick a piece, then click the board. Its top-left lands where you click.</span>
         )}
         <button onClick={reset}>New game</button>
       </div>

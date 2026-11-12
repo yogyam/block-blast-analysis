@@ -16,10 +16,11 @@ export function App() {
         <p className="kicker">An independent, reproducible teardown</p>
         <h1>You aren't playing Block Blast.<br />Block Blast is playing you.</h1>
         <p className="lede">
-          The three pieces you are handed each turn are not a fair shuffle. They are chosen — by a
-          native algorithm with a hundred named strategies, tuned by a server that is also deciding
-          when you are about to quit and how much your next ad is worth. Here is how we know,
-          measured from the game's own code and reproduced with our own simulator.
+          The three pieces you get each turn are not a fair shuffle. They are picked by a native
+          algorithm with more than a hundred named strategies, tuned by a server that is also
+          guessing when you are about to quit and how much your next ad is worth. This is how we
+          know. We read it from the game's own code and rebuilt it in a simulator you can play with
+          below.
         </p>
       </header>
 
@@ -33,9 +34,9 @@ export function App() {
           opened the app up and found an algorithm literally named for dealing a lethal hand.
         </p>
         <p>
-          This essay replicates that finding from scratch and then does what the teardown did not:
-          it measures how adaptive the dealer really is, with a method you could rerun yourself. We
-          start where the suspicion lives — with the pieces.
+          This piece checks that finding from scratch, then goes further and measures how adaptive
+          the dealer really is, with a method you could run yourself. We start where the suspicion
+          starts: with the pieces.
         </p>
       </section>
 
@@ -44,14 +45,15 @@ export function App() {
         <h2>How the game actually works</h2>
         <p>
           The rules take sixty seconds. An 8×8 grid. Each turn you are dealt three shapes. Place all
-          three — no rotating — anywhere they fit. Fill a row or a column and it clears. You keep
-          going until none of your three pieces can be placed anywhere. That last part is the whole
-          game: you never lose by running out of time, only by being handed a hand with nowhere to go.
+          three (you cannot rotate them) anywhere they fit. Fill a row or a column and it clears. You
+          keep going until none of your three pieces can be placed anywhere. That last part is the
+          whole game. You never run out of time. You lose when you are handed three pieces with
+          nowhere to go.
         </p>
         <p>
-          Here is the real thing, with a dealer we can <em>prove</em> is fair: three independent,
-          uniform draws from the piece set, every turn. Play a few hands. Watch the "pieces that fit"
-          count — a fair dealer lets it fall to zero only when the board genuinely leaves no room.
+          Here is the real game, with a dealer we can <em>prove</em> is fair: three independent, even
+          draws from the piece set, every turn. Play a few hands. Watch the "pieces that fit" count.
+          A fair dealer only lets it hit zero when the board really has no room left.
         </p>
         <div className="figure">
           <MiniBoard />
@@ -66,12 +68,12 @@ export function App() {
         <p className="num">3</p>
         <h2>What fair would look like</h2>
         <p>
-          Before we can call a dealer rigged we need to know the shape of fair: under uniform
-          dealing, how long do games last, and what kills you? Here are two thousand fair games for
-          each of three players — a random flailer, a one-step greedy player, and a beam search that
-          looks ahead. Skill moves the whole distribution to the right, but every one has the same
-          shape: a hump and a long tail, and no way to last forever. This is the honest baseline
-          Block Blast gets compared against.
+          Before you can call a dealer rigged, you have to know what fair looks like. Under even
+          dealing, how long do games last, and what ends them? Here are two thousand fair games for
+          each of three players: one that flails at random, one that takes the best single move, and
+          one that searches a few moves ahead. Skill shifts the whole curve to the right, but the
+          shape never changes. A hump, a long tail, and no way to play forever. This is the baseline
+          we hold Block Blast against.
         </p>
         <div className="figure">
           <DistributionExplorer />
@@ -87,18 +89,21 @@ export function App() {
         <p className="num">4</p>
         <h2>Catching a rigged dealer without seeing the deck</h2>
         <p>
-          Here is the trick at the heart of this whole project. You can prove a card dealer is
-          cheating without ever seeing the deck — as long as you know what a fair deck would do and
-          what the dealer can see. In Block Blast the dealer can see the board, and we know exactly
-          how likely a fair dealer was to hand you something playable on it. So for every hand we
-          compute one number — how surprising this hand was, if the dealer were fair — and add the
-          surprises up. Fair surprises cancel out around zero. A biased dealer's pile up.
+          Here is the idea the whole project rests on. You can prove a card dealer is cheating
+          without ever seeing the deck, as long as you know two things: what a fair deck would do,
+          and what the dealer can see. In Block Blast the dealer can see the board. And for any board,
+          we can work out exactly how likely a fair dealer was to hand you something you could play.
+        </p>
+        <p>
+          So for each hand we ask one question. How surprising was this hand, if the dealer were
+          fair? Then we add the surprises up. Under a fair dealer they cancel out around zero. Under a
+          biased one they pile up.
         </p>
         <p>
           Two dealers below. One is fair. The other is rigged the way you choose. Deal hands and
-          watch the evidence meter climb past the line (the point where a fair dealer would land
-          there less than one time in a hundred). The rigged dealer gets caught; the fair one never
-          crosses, no matter how long you watch.
+          watch the evidence meter climb past the line. That line is the point a fair dealer would
+          reach less than one time in a hundred. The rigged dealer gets caught. The fair one never
+          crosses, however long you watch.
         </p>
         <div className="figure">
           <DealerDetector />
@@ -114,23 +119,22 @@ export function App() {
         <p className="num">5</p>
         <h2>Opening the box</h2>
         <p>
-          Up to here everything was black-box: we judged the dealer by its output. Now we open the
-          app. Block Blast is a Cocos game — a thin Java shell, a native engine, and a pile of
-          encrypted JavaScript — but the dealer is not in the JavaScript. It lives in a native
-          library, <code>libtask.so</code>, shipped with its function names intact. Those names are
-          the story. A puzzle game you play on the train carries a routine called{' '}
-          <code className="inline-death">func_death_blcok</code>, and a whole family around it.
+          Up to now this was all black-box. We judged the dealer only by what it dealt. Now we open
+          the app. Block Blast is a Cocos game: a thin Java shell, a native engine, and a pile of
+          encrypted JavaScript. The dealer is not in the JavaScript, though. It lives in a native
+          library, <code>libtask.so</code>, and that library shipped with its function names intact.
+          The names are the story. A puzzle game you play on the train carries a function called{' '}
+          <code className="inline-death">func_death_blcok</code>, with a whole family around it.
         </p>
         <div className="figure">
           <AlgorithmCatalogue />
           <p className="caption">Read directly from <code>libtask.so</code> (no decryption, no key). Full catalogue and the Ghidra read in <code>docs/findings/libtask-decompiled.md</code>.</p>
         </div>
         <p>
-          The lethal search is not a curiosity that fires once. From early in a game the script asks
-          for it on <em>every</em> deal — it just cannot always comply, because a hand that is
-          unplaceable in every order only exists when the board is tight enough. Here is how often
-          one exists, measured by replaying our own copy of the generator on sixty boards at each
-          fill level:
+          The lethal search is not a one-off. From fairly early in a game, the script asks for it on
+          <em> every</em> deal. It just cannot always deliver, because a hand that is unplaceable in
+          every order only exists once the board is tight enough. Here is how often one exists. We
+          replayed our own copy of the generator on sixty boards at each fill level and counted.
         </p>
         <div className="figure">
           <LineChart
@@ -140,7 +144,7 @@ export function App() {
           />
           <p className="caption">
             Algorithm 24001's hit rate by board fill (our standalone harness, bit-exact to the live
-            game). On the crowded boards a mid-game player actually sees — 20 to 30 empty cells — a
+            game). On the crowded boards a mid-game player actually sees, 20 to 30 empty cells, a
             hand with nowhere to go is available to the dealer most of the time.
           </p>
         </div>
@@ -150,10 +154,10 @@ export function App() {
         <p className="num">6</p>
         <h2>Playing back</h2>
         <p>
-          So the dealer is adaptive — which, oddly, does not mean it is simply out to get you. We
-          rebuilt a working model of the observed dealer and let the same three players loose on it.
-          You might expect lower scores. The opposite happens: against the reimplemented dealer every
-          player scores <em>higher</em> on average than against a fair one.
+          So the dealer adapts. Oddly, that does not mean it is simply out to get you. We rebuilt a
+          working model of the dealer we saw and set the same three players loose on it. You would
+          expect lower scores. The opposite happens. Against the rebuilt dealer, every player scores
+          higher on average than against a fair one.
         </p>
         <div className="figure">
           <BarChart
@@ -169,14 +173,17 @@ export function App() {
           </p>
         </div>
         <p>
-          That is the whole trick in one chart. A dealer that was merely hard would be uninstalled.
-          This one is <em>generous</em> where it is cheap to be — it filters the nastiest shapes out
-          of your opening and keeps the board clearing — so the average game feels good and runs
-          long. It saves the lethal hand for the places that matter: near your record, after a fast
-          streak, when it has the most to gain by ending the run. Knowing that is the strategy. Keep
-          the board flat and the big shapes placeable; bank empty space <em>before</em> you reach
-          your personal best, because that is where the squeeze comes; and read the free revive for
-          what it is — a retention tool, offered when the model thinks you are about to leave.
+          That is the whole trick, in one chart. A dealer that was just hard would get uninstalled.
+          This one is generous where being generous is cheap. It keeps the worst shapes out of your
+          opening and helps the board clear, so the average game feels good and runs long. It saves
+          the lethal hand for the moments that count: near your best score, after a fast streak, when
+          ending the run buys it the most.
+        </p>
+        <p>
+          Knowing that is the whole strategy. Keep the board flat and leave room for the big shapes.
+          Bank empty space before you reach your best score, because that is where the squeeze comes.
+          And take the free revive for what it is: a way to keep you playing, offered when the game
+          thinks you are about to leave.
         </p>
       </section>
 
@@ -184,59 +191,60 @@ export function App() {
         <p className="num">7</p>
         <h2>It is not just Block Blast</h2>
         <p>
-          None of the machinery is new. Difficulty that watches you and adjusts is a thirty-year-old
-          idea with its own canonical paper, its own patents, its own lawsuits. What is new is cheap
-          enough computing to run a model of <em>you</em> — when you will quit, what your attention is
-          worth — on a free puzzle game, and tie the pieces to it.
+          None of this machinery is new. Difficulty that watches you and adjusts is a thirty-year-old
+          idea, with its own landmark paper, its own patents, its own lawsuits. What is new is that
+          computing got cheap enough to run a model of <em>you</em> on a free puzzle game, one that
+          guesses when you will quit and what your attention is worth, and then wire the pieces to it.
         </p>
         <div className="figure">
           <Timeline />
           <p className="caption">Each entry sourced in <code>docs/research/04-dda-and-psychology.md</code>.</p>
         </div>
         <p>
-          So the question to carry out of here is not "is Block Blast rigged." It is the one to ask
-          of any free game that is a little too good at keeping you: <em>what is it optimizing, and is
-          it you?</em> You now know how to answer it — count the surprises.
+          So the question to walk away with is not really "is Block Blast rigged." It is the one
+          worth asking of any free game that is a little too good at keeping you around. What is it
+          optimizing for, and is it you? Now you know one way to check. Count the surprises.
         </p>
       </section>
 
       <section className="chapter closing">
         <h2>What we did not find</h2>
         <p>
-          Honesty is the whole point of a method, so here is what this does <em>not</em> show. We
-          confirmed the lethal algorithm exists in the binary and is requested on nearly every
-          late-game deal — but we did not establish how often a real player is actually handed one.
-          The script layer gates it, and the native candidate we can log is not always the hand that
-          reaches the tray.
+          A method is only worth something if it is honest about its limits, so here is what this
+          does <em>not</em> show. We confirmed the lethal algorithm exists in the binary, and that
+          the game asks for it on nearly every late-game deal. We did not establish how often a real
+          player is actually handed one. The script layer decides whether to use it, and the
+          candidate hand we can log is not always the hand that reaches the tray.
         </p>
         <p>
-          We have not yet run the frozen detector on a large sample of real games. The capture
+          We have also not run the frozen detector on a large sample of real games yet. The capture
           pipeline works, but reliable unattended play across many games and fresh installs is a
           separate build still in progress. So the real-data effect sizes (H2 rescue, H3 the squeeze
-          near the record, H4 lethal rate), the differences between server-assigned arms (H7), and the
-          ad-value-timed revive (H8) are described here as mechanisms found in the code, not yet
-          quantified in the wild. The "higher score under the real dealer" result is our
-          reimplementation with chosen parameters, not a measurement of the live game. And everything
-          was Android, Classic mode, on an emulator with no ad history — a different population from a
-          phone in a real pocket.
+          near the record, H4 lethal rate), the differences between server-assigned arms (H7), and
+          the ad-value-timed revive (H8) are described here as mechanisms we found in the code, not
+          yet measured in the wild. The "higher score under the real dealer" result is our
+          reimplementation with chosen settings, not a measurement of the live game. And all of it
+          was Android, Classic mode, on an emulator with no ad history. That is a different
+          population from a real phone in a real pocket.
         </p>
         <p>
-          What is solid: the mechanism is in the code, under its own names; the detector is validated
-          on known generators (zero false positives on fair dealers) and frozen before it ever touches
-          real data; and in every reimplementation we can run, the three pieces are not a fair shuffle.
+          What is solid: the mechanism is right there in the code, under its own names. The detector
+          works on dealers we built and know the truth about, with zero false alarms on fair ones,
+          and it was frozen before it ever touched real data. And in every version we can run
+          ourselves, the three pieces are not a fair shuffle.
         </p>
       </section>
 
       <section className="chapter closing">
         <h2>Method, in one paragraph</h2>
         <p>
-          Every number here is reproducible. The rules engine, the generator zoo, the detector and the
-          essay demos are one TypeScript codebase; the statistical method — eight pre-registered tests,
-          Holm-corrected at &alpha; = 0.01 — was committed and tagged (<code>prereg-v1</code>)
-          <em>before</em> it was pointed at any real data, and it passes a synthetic validation that
-          flags every rigged generator and never a fair one. Each figure regenerates from a script
-          named in its caption. The full method is <code>docs/research/06-methods.md</code>; the
-          white-box findings are <code>docs/findings/</code>.
+          Every number here is reproducible. The rules engine, the dealers, the detector and these
+          demos are all one TypeScript codebase. The statistical method is eight tests fixed in
+          advance, corrected for multiple comparisons at &alpha; = 0.01. We committed and tagged it
+          (<code>prereg-v1</code>) before pointing it at any real data, and it passes a check on
+          known dealers: it flags every rigged one and never a fair one. Each figure rebuilds from a
+          script named in its caption. The full method is <code>docs/research/06-methods.md</code>,
+          and the white-box findings are in <code>docs/findings/</code>.
         </p>
       </section>
 
@@ -244,17 +252,17 @@ export function App() {
         <h2>Credits and right of reply</h2>
         <p>
           This replicates and quantifies the October 2026 teardown by Ayo Omolewa ("Ayoships"), which
-          first opened the app and named the lethal algorithm; we treated its claims as hypotheses and
-          verified them from our own copy. It stands on open-source clones, solvers and board-readers,
-          and on the DDA literature above. Nothing here publishes a key, a decrypted bundle, the APK,
-          or any step that would let someone repackage the game. Before publishing we would put these
-          findings to Hungry Studio and carry their response, or note the date we asked and heard
-          nothing.
+          first opened the app and named the lethal algorithm. We treated its claims as things to
+          test, and checked them against our own copy. It also builds on open-source clones, solvers
+          and board-readers, and on the research above. Nothing here publishes a key, a decrypted
+          bundle, the APK, or any step that would let someone repackage the game. Before publishing,
+          we would put these findings to Hungry Studio and carry their reply, or note the date we
+          asked and heard nothing.
         </p>
       </section>
 
       <footer className="site-foot">
-        <p>An independent, reproducible analysis. Methods and aggregate results are public; the key, the decrypted scripts and the APK are not.</p>
+        <p>An independent, reproducible analysis. Methods and aggregate results are public. The key, the decrypted scripts and the APK are not.</p>
       </footer>
     </main>
   );
