@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Is Block Blast Rigged?</title>
+<meta name="description" content="A reverse-engineering teardown of who really chooses your pieces in Block Blast, and how to prove a dealer cheats without seeing the deck.">
+<meta property="og:title" content="Is Block Blast Rigged?">
+<meta property="og:description" content="I took apart one of the most-downloaded games in the world to find out who is choosing your pieces. The short answer: not a fair shuffle.">
+<meta property="og:type" content="article">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:wght@600;700&display=swap">
+<style>
+  /* Layout: one centered reading column on a cool-ink ground; forensic, editorial, plain. */
+  :root {
+    --bg: #f6f6f3; --surface: #ffffff; --fg: #181a1f; --muted: #5b6270;
+    --line: rgba(20,22,28,0.12); --accent: #2f5fd0; --danger: #cf4035; --ok: #1e8a5a;
+    --serif: "IBM Plex Serif", Georgia, serif;
+    --sans: "IBM Plex Sans", system-ui, -apple-system, sans-serif;
+    --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0e1015; --surface: #171a22; --fg: #e9ebf1; --muted: #99a2b4; --line: rgba(255,255,255,0.13);
+      --accent: #74a0ff; --danger: #ff6a5d; --ok: #43c088; color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0e1015; --surface: #171a22; --fg: #e9ebf1; --muted: #99a2b4; --line: rgba(255,255,255,0.13);
+    --accent: #74a0ff; --danger: #ff6a5d; --ok: #43c088; color-scheme: dark;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--sans); line-height: 1.65; font-size: 18px; -webkit-font-smoothing: antialiased; }
+  img, svg { max-width: 100%; }
+
+  .wrap { max-width: 44rem; margin: 0 auto; padding-left: max(18px, env(safe-area-inset-left, 0px)); padding-right: max(18px, env(safe-area-inset-right, 0px)); padding-block: 0 60px; }
+  .toggle { position: fixed; top: max(12px, env(safe-area-inset-top, 0px)); right: max(12px, env(safe-area-inset-right, 0px)); width: 38px; height: 38px; border-radius: 50%; border: 1px solid var(--line); background: var(--surface); color: var(--fg); font-size: 16px; cursor: pointer; z-index: 10; line-height: 1; }
+  .toggle:hover { border-color: var(--accent); }
+
+  header.hero { padding-block: 56px 20px; }
+  .eyebrow { font-family: var(--mono); font-size: 12.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); margin: 0 0 14px; }
+  h1 { font-family: var(--serif); font-weight: 700; font-size: clamp(34px, 7vw, 54px); line-height: 1.04; letter-spacing: -0.015em; margin: 0 0 16px; text-wrap: balance; }
+  .dek { font-size: 20px; color: var(--muted); margin: 0; }
+  .byline { font-family: var(--mono); font-size: 13px; color: var(--muted); margin: 22px 0 0; }
+
+  h2 { font-family: var(--serif); font-weight: 600; font-size: clamp(23px, 4vw, 30px); line-height: 1.15; letter-spacing: -0.01em; margin: 52px 0 14px; text-wrap: balance; }
+  p { margin: 0 0 18px; }
+  a { color: var(--accent); text-decoration: none; border-bottom: 1px solid color-mix(in oklab, var(--accent) 35%, transparent); }
+  a:hover { border-bottom-color: var(--accent); }
+  strong { font-weight: 600; }
+  code { font-family: var(--mono); font-size: 0.86em; background: color-mix(in oklab, var(--fg) 7%, transparent); padding: 1px 6px; border-radius: 5px; }
+
+  figure { margin: 26px 0; }
+  svg { height: auto; display: block; }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 4px 0 22px; }
+  .chip { font-family: var(--mono); font-size: 13px; padding: 4px 10px; border-radius: 6px; background: color-mix(in oklab, var(--fg) 6%, transparent); color: var(--muted); border: 1px solid var(--line); }
+  .chip.death { color: var(--danger); background: color-mix(in oklab, var(--danger) 12%, transparent); border-color: color-mix(in oklab, var(--danger) 35%, transparent); }
+
+  .callout { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 20px 22px; margin: 28px 0; }
+  .callout h3 { font-family: var(--sans); font-size: 14px; letter-spacing: 0.03em; text-transform: uppercase; color: var(--muted); margin: 0 0 14px; }
+  .callout ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 11px; }
+  .callout li { display: grid; grid-template-columns: 22px 1fr; gap: 10px; align-items: start; font-size: 16.5px; }
+  .mk { font-weight: 700; line-height: 1.5; }
+  .mk.yes { color: var(--ok); } .mk.no { color: var(--danger); } .mk.part { color: var(--accent); }
+
+  .pull { font-family: var(--serif); font-size: clamp(22px, 4vw, 28px); line-height: 1.25; color: var(--fg); border-left: 3px solid var(--accent); padding-left: 20px; margin: 30px 0; text-wrap: balance; }
+
+  .meterbox { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 18px 20px; }
+  .meter-row { display: grid; grid-template-columns: 92px 1fr auto; gap: 12px; align-items: center; margin: 10px 0; font-size: 15px; }
+  .meter-name { font-weight: 600; }
+  .meter-track { position: relative; height: 13px; border-radius: 7px; background: color-mix(in oklab, var(--fg) 9%, transparent); min-width: 0; }
+  .meter-fill { position: absolute; inset: 0 auto 0 0; border-radius: 7px; }
+  .meter-tick { position: absolute; top: -3px; bottom: -3px; width: 2px; background: var(--fg); opacity: 0.5; left: 62%; }
+  .meter-cap { margin: 12px 0 0; font-size: 13.5px; color: var(--muted); font-family: var(--mono); }
+
+  /* SVG fills via CSS so they follow the theme (var() in a fill attribute is unreliable). */
+  .boardbg { fill: var(--surface); stroke: var(--line); }
+  .c-on { fill: var(--accent); }
+  .c-off { fill: color-mix(in oklab, var(--fg) 9%, transparent); }
+  .note { fill: var(--muted); font-family: "IBM Plex Mono", monospace; font-size: 13px; }
+
+  footer { margin: 56px 0 8px; padding-top: 24px; border-top: 1px solid var(--line); color: var(--muted); font-size: 15px; }
+  footer a { font-weight: 500; }
+  .links { display: flex; flex-wrap: wrap; gap: 10px 18px; margin: 0 0 18px; }
+
+  @media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+</style>
+</head>
+<body>
+<button class="toggle" id="themeBtn" aria-label="Toggle light or dark theme" title="Toggle theme">☾</button>
+
+<div class="wrap">
+  <header class="hero">
+    <p class="eyebrow">A reverse-engineering teardown</p>
+    <h1>Is Block&nbsp;Blast rigged?</h1>
+    <p class="dek">I took apart one of the most-downloaded games in the world to find out who is really choosing your pieces. The short answer: it is not a fair shuffle.</p>
+    <p class="byline">~8 min read · all code open source</p>
+  </header>
+
+  <p>You are one move from clearing a row. There is an obvious gap in the board. The game hands you three shapes, and not one of them fits. If you have played Block Blast, you have felt this, and you have probably muttered that there is no way it is random. A lot of people have. The company has never said anything about it. So I checked properly.</p>
+
+  <figure aria-label="A board with one gap and three pieces that do not fit it">
+    <svg viewBox="0 0 440 182" role="img">
+      <rect class="boardbg" x="0" y="1" width="180" height="180" rx="10"/>
+      <g id="cells"></g>
+      <g transform="translate(214,44)">
+        <g fill="#cf4035">
+          <rect x="0" y="0" width="30" height="30" rx="5"/><rect x="34" y="0" width="30" height="30" rx="5"/>
+          <rect x="0" y="34" width="30" height="30" rx="5"/>
+        </g>
+        <g fill="#2f74d0" transform="translate(96,0)">
+          <rect x="0" y="0" width="30" height="30" rx="5"/><rect x="34" y="0" width="30" height="30" rx="5"/><rect x="68" y="0" width="30" height="30" rx="5"/>
+        </g>
+        <g fill="#f2b134" transform="translate(96,46)">
+          <rect x="0" y="0" width="30" height="30" rx="5"/><rect x="0" y="34" width="30" height="30" rx="5"/>
+        </g>
+      </g>
+      <text class="note" x="214" y="150">one gap, three pieces,</text>
+      <text class="note" x="214" y="170">and none of them fit it.</text>
+    </svg>
+  </figure>
+
+  <h2>What I actually did</h2>
+  <p>I did not want to argue from a feeling, so I did four things. I pulled the game's code apart and read it. I rebuilt its rules and its dealer from scratch in TypeScript. I wrote a statistical test that can tell a rigged dealer from a fair one. And before I trusted that test on anything, I proved it works on dealers I built myself and already knew the truth about. All of it is open source, linked at the bottom.</p>
+
+  <h2>The part that picks your pieces is hidden on purpose</h2>
+  <p>Block Blast is mostly JavaScript, and that JavaScript is encrypted. But the piece of it that chooses your three shapes is not in there at all. It lives in a separate compiled library called <code>libtask.so</code>, and whoever shipped it left the function names in. That was careless, because the names tell the whole story.</p>
+  <div class="chips">
+    <span class="chip death">func_death_blcok</span>
+    <span class="chip death">selectBlockDealDeathState</span>
+    <span class="chip death">selectBlockVeryDifficultProblem</span>
+    <span class="chip death">trap_high_near_danger</span>
+    <span class="chip">selectRandomNoDie</span>
+    <span class="chip">selectBlockReviveReplace</span>
+  </div>
+  <p>There is a function literally named for dealing a death block, with a whole family of "hard problem" and "lethal puzzle" routines around it. This is a puzzle game you open on the train. It did not have to contain a routine whose only job is to search for a hand you cannot possibly play.</p>
+
+  <h2>How often can it actually kill you?</h2>
+  <p>A "lethal" hand is three pieces that cannot be placed in any order, no matter how well you play. One only exists when the board is already tight. Reading the code, I found that from early in a game the dealer asks for a lethal hand on almost every single deal. It cannot always find one. But on the crowded boards you actually see in the middle of a game, around 20 to 30 empty cells, it usually can.</p>
+  <p class="pull">A dead-end hand is available to the dealer about 85 to 100% of the time on a normal mid-game board. The question was never whether it could trap you. It was whether it chooses to.</p>
+
+  <h2>How do you prove a dealer cheats without seeing the deck?</h2>
+  <p>Here is the idea the whole project rests on, and it is simpler than it sounds. You can prove a card dealer is cheating without ever seeing the deck, as long as you know two things: what a fair deck would do, and what the dealer can see. The dealer can see your board. And for any board, I can work out exactly how likely a fair dealer was to hand you something you could play.</p>
+  <p>So for each hand I ask one question. How surprising was this hand, if the dealer were honest? Then I add the surprises up. Under an honest dealer the surprises cancel out around zero. Under a rigged one they pile up in one direction, and the longer you watch, the more obvious it gets. Below is that meter run on two hidden dealers. One is fair. One is not.</p>
+
+  <figure aria-label="An evidence meter catching a rigged dealer while a fair one stays flat">
+    <div class="meterbox">
+      <div class="meter-row">
+        <span class="meter-name">Dealer A</span>
+        <span class="meter-track"><span class="meter-fill" style="right:8%;background:var(--danger);"></span><span class="meter-tick"></span></span>
+        <span style="font-family:var(--mono);font-size:12.5px;color:var(--danger);font-weight:600;">caught</span>
+      </div>
+      <div class="meter-row">
+        <span class="meter-name">Dealer B</span>
+        <span class="meter-track"><span class="meter-fill" style="right:78%;background:var(--accent);"></span><span class="meter-tick"></span></span>
+        <span style="font-family:var(--mono);font-size:12.5px;color:var(--muted);">fair</span>
+      </div>
+      <p class="meter-cap">the tick is the line a fair dealer crosses less than 1 time in 100</p>
+    </div>
+  </figure>
+
+  <p>The important part is the boring part. I checked this test on a zoo of dealers I wrote myself, fair ones and rigged ones, so I knew the right answer in advance. It flags every rigged dealer and never once cries wolf on a fair one. Then I froze the whole method in a public, timestamped commit <strong>before</strong> pointing it at anything real, so I could not quietly move the goalposts later.</p>
+
+  <h2>The twist: it is not simply out to get you</h2>
+  <p>Here is what surprised me most. The dealer is not just mean. In every version I can run, players score <strong>higher</strong> against it than against a fair dealer. It keeps the nastiest shapes out of your opening and helps the board clear, so the average game feels good and runs long.</p>
+  <p>That is the trick, and it is a smart one. A game that was simply hard would get deleted. This one is generous where being generous is cheap, and it saves the squeeze for the moments worth the most to it: near your best score, after a fast streak, right when ending your run would sting. If you want to play it better, keep the board flat, leave room for the big pieces, and bank some empty space <strong>before</strong> you reach your personal best, because that is where the pressure arrives.</p>
+
+  <h2>The part that should bother you: the ad connection</h2>
+  <p>While you play, the game quietly calls an "ad value" service. I decoded exactly what it sends. For each ad opportunity it reports your rewarded-ad history, how many you have watched this session, your lifetime totals, how long you have had the app, and more. It is a model whose entire job is to predict how much your next ad is worth. There is also a setting, switched on for my install, named <code>RewardHighValueAdHarvest</code>. The machinery to turn the screws exactly when your attention is most valuable is all present, and it is named.</p>
+  <p>But I have to be straight about what I did and did not see. I confirmed the ad-value model exists and read its inputs. I confirmed the setting exists and is assigned. I did <strong>not</strong> catch the two wired together in the act, because my test phone never watched a real ad, so the ad-value model stayed empty and that setting never fired. The pieces are built and named. I cannot yet show you the moment they combine. That is the next thing to measure.</p>
+
+  <div class="callout">
+    <h3>What's solid vs. what isn't</h3>
+    <ul>
+      <li><span class="mk yes">&#10003;</span><span>A dedicated lethal-hand algorithm exists in the code, under its own name, and is requested on almost every late-game deal.</span></li>
+      <li><span class="mk yes">&#10003;</span><span>The detector tells rigged dealers from fair ones with no false alarms, and was frozen publicly before it saw real data.</span></li>
+      <li><span class="mk yes">&#10003;</span><span>An ad-value model and a matching "harvest" setting both exist and are switched on.</span></li>
+      <li><span class="mk part">?</span><span>How often a <strong>real</strong> player is actually dealt a lethal hand. The game gates it in a layer I cannot fully see yet.</span></li>
+      <li><span class="mk no">&#10007;</span><span>The ad-value-to-difficulty link firing on a real player. The mechanism is there; I have not measured it happening.</span></li>
+    </ul>
+  </div>
+
+  <p>None of this is new, by the way. Difficulty that watches you and adjusts is a thirty-year-old idea with its own research, its own patents, even its own lawsuits. One granted patent describes predicting a player's churn and feeding a value into the game's random number generator, with "undetectable by the user" written in as a goal. What is new is that computing got cheap enough to run a model of <strong>you</strong>, on a free puzzle game, and wire your next three pieces to it.</p>
+
+  <p>So the question to walk away with is not really "is Block Blast rigged." It is the one worth asking of any free game that is a little too good at keeping you around. What is it optimizing for, and is it you? Now you know one way to check. Count the surprises.</p>
+
+  <footer>
+    <div class="links">
+      <a href="https://github.com/yogyam/block-blast-analysis">The code &amp; full writeup on GitHub</a>
+      <a href="https://github.com/yogyam/block-blast-analysis/tree/main/apps/essay">The interactive essay (source)</a>
+    </div>
+    <p>Everything here is reproducible: the rules engine, the dealer models, the detector, and an interactive essay where you can play the fair board and watch the detector catch a rigged dealer. This builds on the October 2026 teardown by Ayo Omolewa ("Ayoships"), who first opened the app and named the lethal algorithm; I treated those claims as things to test and checked them against my own copy. Methods and findings are public. The decryption key, the decrypted scripts and the APK are not.</p>
+  </footer>
+</div>
+
+<script>
+  // Board illustration: 8x8, fill two rows except the last column to leave a visible gap.
+  (function () {
+    var g = document.getElementById('cells');
+    if (!g) return;
+    var o = 9, s = 18, gap = 2, ns = 'http://www.w3.org/2000/svg';
+    for (var r = 0; r < 8; r++) for (var c = 0; c < 8; c++) {
+      var filled = (r === 4 || r === 5) && c < 7;
+      var rect = document.createElementNS(ns, 'rect');
+      rect.setAttribute('x', o + c * (s + gap)); rect.setAttribute('y', o + r * (s + gap) + 1);
+      rect.setAttribute('width', s); rect.setAttribute('height', s); rect.setAttribute('rx', 4);
+      rect.setAttribute('class', filled ? 'c-on' : 'c-off');
+      g.appendChild(rect);
+    }
+  })();
+  // Theme toggle (per-viewer convenience; falls back silently).
+  (function () {
+    var btn = document.getElementById('themeBtn'), root = document.documentElement;
+    function stored() { try { return localStorage.getItem('bb-blog-theme'); } catch (e) { return null; } }
+    function isDark(t) { return t === 'dark' || (!t && matchMedia('(prefers-color-scheme: dark)').matches); }
+    function apply(t) {
+      if (t === 'dark' || t === 'light') root.setAttribute('data-theme', t); else root.removeAttribute('data-theme');
+      btn.textContent = isDark(t) ? '☀' : '☾';
+    }
+    apply(stored());
+    btn.addEventListener('click', function () {
+      var cur = root.getAttribute('data-theme');
+      var next = isDark(cur) ? 'light' : 'dark';
+      try { localStorage.setItem('bb-blog-theme', next); } catch (e) {}
+      apply(next);
+    });
+  })();
+</script>
+</body>
+</html>
