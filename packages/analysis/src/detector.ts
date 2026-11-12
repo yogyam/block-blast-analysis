@@ -107,8 +107,8 @@ export function runDetector(games: readonly Game[], opts: DetectorOptions = {}):
   for (const r of records) if (r.bucket_id !== undefined) arms.add(r.bucket_id);
   const h7ran = arms.size >= 2;
 
-  // H8: ad-value timing — needs ad covariates.
-  const h8ran = records.some((r) => r.revive_offered !== undefined || r.ad_shown !== undefined || r.ad_ecpm !== undefined || r.algo_id != null);
+  // H8: ad-value timing — needs genuine ad covariates (not algo_id, which is a white-box field).
+  const h8ran = records.some((r) => r.revive_offered !== undefined || r.ad_shown !== undefined || (r.ad_ecpm !== undefined && r.ad_ecpm !== null));
 
   const hyps: HypothesisResult[] = [
     {

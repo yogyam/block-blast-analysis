@@ -132,7 +132,32 @@ node apps/sim-cli/dist/cli.js power --generator lethal --target H4 --games-list 
 
 It establishes that the detector is calibrated (no false alarms on fair or merely non-uniform
 dealers) and powered against each adaptive mechanism in the zoo, at the sample sizes we can
-collect. It does **not** touch Block Blast data: that run happens only after the method is
-frozen and tagged (§8 of the methods doc), and is reported separately. The piece set and pool
-used here (`live`, ids 2–31) are the white-box finding, but the scoring and exact weights do not
-affect the detector, only the simulated game lengths.
+collect. The piece set and pool used here (`live`, ids 2–31) are the white-box finding, but the
+scoring and exact weights do not affect the detector, only the simulated game lengths.
+
+## 7. First real-data pass — the bridge works, the sample does not (post-freeze)
+
+`packages/capture/src/nativeLog.ts` converts the live `libtask` capture (`offerTopic`
+requests/responses rebuilt into a session file) into the §10 schema: the request's 8×8
+colour-id board (−1 = empty) packs into the engine bitboard, the response's `blockIds` is the
+dealt triple, `currRecordGrade`/`highRecordGrade` are score/best, and the solvability oracle
+fills `hand_solvable`. Run it, then `sim analyze`.
+
+On the one clean capture we have (`session5`), this yields **19 deals across a single
+continuous game** (score climbs 0 → 3040, never resets). Every dealt id maps to the engine
+shape table (0 unknown ids — the native↔engine id mapping holds end to end), and the 45
+discarded `offerTopic` calls are the empty intermediate pipeline stages (21001/21003 board-clear,
+16009 hard-problem) that request but return no hand, exactly as the white-box pipeline predicts.
+
+The frozen detector runs on these deals and, correctly, **rejects nothing**: one game is three
+to four orders of magnitude below the ~50–240 games §6 requires. The point estimates are
+directional but meaningless at n = 1 game (H1 board-dependence LR p ≈ 0.09; H4 lethal-direction
+Z = −1.72, mean Λ = 0.22 vs one observed death). H7 and H8 do not run — no arm or ad covariate
+in this capture.
+
+This is a **pipeline validation, not a verdict on Block Blast.** The bridge, schema and detector
+are ready; the missing ingredient is scale. The next data task is a controlled automated-player
+capture (fixed policy, human pacing) across tens to hundreds of games per install and several
+installs, logging the tray-accurate hands and the arm/ad covariates, then re-running this exact
+frozen detector. The `source: 'shim-candidate'` tag records that these rows are the native
+candidate, not a guaranteed tray observation (§10b).

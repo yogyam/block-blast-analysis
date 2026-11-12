@@ -10,3 +10,4 @@ export * from './boardReader.ts';
 export * from './trayReader.ts';
 export * from './drag.ts';
 export * from './player.ts';
+export * from './nativeLog.ts';

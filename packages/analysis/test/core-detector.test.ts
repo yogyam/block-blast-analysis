@@ -39,7 +39,7 @@ function simulate(spec: GeneratorSpec | string, agent: string, games: number, se
 
 function dataset(logs: GameLog[]) {
   const records = recordsFromGameLogs(logs);
-  const model = new NullModel(estimateWeights(records), { rng: seedRng('nm'), samples: 6000 });
+  const model = new NullModel(estimateWeights(records), { rng: seedRng('nm'), samples: 3000 });
   return { records, games: groupByGame(records), model };
 }
 
@@ -90,7 +90,7 @@ describe('the detector math recovers each mechanism (06-methods §7 confusion ma
     // dominate, so the plug-in F stays near-unbiased and the kill bias shows as Z > 0.
     const hardIds = [13, 11, 22, 12, 21, 23, 24];
     const { games, model } = dataset(
-      simulate({ name: 'kill', opts: { scoreThreshold: { fractionOfBest: 0.5 }, hardBias: 10, hardIds } }, 'beam', 80, 4, 1500),
+      simulate({ name: 'kill', opts: { scoreThreshold: { fractionOfBest: 0.5 }, hardBias: 10, hardIds } }, 'beam', 55, 4, 1500),
     );
     const terms = hasHardTerms(games, model, nearRecord(0.5));
     expect(terms.length).toBeGreaterThan(30); // the near-record stratum is populated

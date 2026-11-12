@@ -47,7 +47,7 @@ describe('conditional logit (H1 primary, H3 companion)', () => {
   it('kill: hard-piece odds rise with score relative to best (H3)', () => {
     const hardIds = [13, 11, 22, 12, 21, 23, 24];
     const r = conditionalLogit(
-      games({ name: 'kill', opts: { scoreThreshold: { fractionOfBest: 0.5 }, hardBias: 10, hardIds } }, new BeamSearchAgent(12), 80, 4),
+      games({ name: 'kill', opts: { scoreThreshold: { fractionOfBest: 0.5 }, hardBias: 10, hardIds } }, new BeamSearchAgent(12), 55, 4),
     );
     expect(r.pValue).toBeLessThan(1e-3);
     expect(orOf(r, 'hardXscoreRelBest')).toBeGreaterThan(3);

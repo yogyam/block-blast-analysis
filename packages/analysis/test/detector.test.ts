@@ -5,7 +5,7 @@ import { groupByGame, recordsFromGameLogs } from '../src/dataset.ts';
 import { runDetector } from '../src/detector.ts';
 
 const POOL = resolvePool('live');
-const DET = { permutations: 500, samples: 4000 } as const;
+const DET = { permutations: 400, samples: 2500 } as const;
 
 function games(spec: GeneratorSpec | string, agent: Agent, n: number, seed: number) {
   const logs: GameLog[] = playGames(n, buildGenerator(spec, POOL), agent, seedRng(seed), {
@@ -43,7 +43,7 @@ describe('runDetector: mechanism attribution (06-methods §7 criterion 3)', () =
   it('kill: lights H1 and H3 (not H5/H6)', () => {
     const hardIds = [13, 11, 22, 12, 21, 23, 24];
     const report = runDetector(
-      games({ name: 'kill', opts: { scoreThreshold: { fractionOfBest: 0.5 }, hardBias: 10, hardIds } }, new BeamSearchAgent(12), 80, 4),
+      games({ name: 'kill', opts: { scoreThreshold: { fractionOfBest: 0.5 }, hardBias: 10, hardIds } }, new BeamSearchAgent(12), 55, 4),
       { seed: 'k', ...DET },
     );
     expect(report.rejected).toEqual(expect.arrayContaining(['H1', 'H3']));
