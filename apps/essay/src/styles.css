@@ -115,3 +115,19 @@ button:disabled { opacity: 0.45; cursor: default; }
 code { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 0.9em; }
 
 code.inline-death { color: var(--danger); }
+
+/* --- §7 timeline, closing, footer, theme toggle --- */
+.timeline { list-style: none; margin: 0; padding: 0; position: relative; }
+.timeline::before { content: ''; position: absolute; left: 70px; top: 6px; bottom: 6px; width: 2px; background: color-mix(in oklab, var(--fg) 14%, transparent); }
+.timeline li { display: grid; grid-template-columns: 56px 24px 1fr; gap: 6px; align-items: start; padding: 10px 0; position: relative; }
+.tl-year { text-align: right; color: var(--muted); font-variant-numeric: tabular-nums; font-size: 14px; padding-top: 1px; }
+.tl-node { width: 12px; height: 12px; border-radius: 50%; background: var(--board-bg); border: 2px solid var(--accent); margin: 4px auto 0; z-index: 1; }
+.timeline li.here .tl-node { background: var(--danger); border-color: var(--danger); }
+.tl-title { font-weight: 600; margin-bottom: 2px; }
+.timeline li.here .tl-title { color: var(--danger); }
+.tl-detail { color: color-mix(in oklab, var(--fg) 82%, var(--muted)); font-size: 14.5px; }
+.chapter.closing h2 { font-size: clamp(20px, 3.4vw, 26px); }
+.chapter.closing { margin: 40px 0; }
+.site-foot { margin: 56px 0 0; padding-top: 24px; border-top: 1px solid color-mix(in oklab, var(--fg) 12%, transparent); color: var(--muted); font-size: 13.5px; }
+.theme-toggle { position: fixed; top: 14px; right: 14px; width: 40px; height: 40px; border-radius: 50%; background: var(--board-bg); color: var(--fg); border: 1px solid color-mix(in oklab, var(--fg) 18%, transparent); font-size: 18px; line-height: 1; padding: 0; z-index: 10; }
+.theme-toggle:hover { filter: brightness(1.1); }

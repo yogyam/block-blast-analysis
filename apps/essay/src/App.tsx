@@ -5,10 +5,13 @@ import { AlgorithmCatalogue } from './components/AlgorithmCatalogue.tsx';
 import { LineChart } from './components/LineChart.tsx';
 import { BarChart } from './components/BarChart.tsx';
 import pb from './data/playback.json';
+import { Timeline } from './components/Timeline.tsx';
+import { ThemeToggle } from './components/ThemeToggle.tsx';
 
 export function App() {
   return (
     <main className="essay">
+      <ThemeToggle />
       <header className="hero">
         <p className="kicker">An independent, reproducible teardown</p>
         <h1>You aren't playing Block Blast.<br />Block Blast is playing you.</h1>
@@ -176,6 +179,83 @@ export function App() {
           what it is — a retention tool, offered when the model thinks you are about to leave.
         </p>
       </section>
+
+      <section className="chapter">
+        <p className="num">7</p>
+        <h2>It is not just Block Blast</h2>
+        <p>
+          None of the machinery is new. Difficulty that watches you and adjusts is a thirty-year-old
+          idea with its own canonical paper, its own patents, its own lawsuits. What is new is cheap
+          enough computing to run a model of <em>you</em> — when you will quit, what your attention is
+          worth — on a free puzzle game, and tie the pieces to it.
+        </p>
+        <div className="figure">
+          <Timeline />
+          <p className="caption">Each entry sourced in <code>docs/research/04-dda-and-psychology.md</code>.</p>
+        </div>
+        <p>
+          So the question to carry out of here is not "is Block Blast rigged." It is the one to ask
+          of any free game that is a little too good at keeping you: <em>what is it optimizing, and is
+          it you?</em> You now know how to answer it — count the surprises.
+        </p>
+      </section>
+
+      <section className="chapter closing">
+        <h2>What we did not find</h2>
+        <p>
+          Honesty is the whole point of a method, so here is what this does <em>not</em> show. We
+          confirmed the lethal algorithm exists in the binary and is requested on nearly every
+          late-game deal — but we did not establish how often a real player is actually handed one.
+          The script layer gates it, and the native candidate we can log is not always the hand that
+          reaches the tray.
+        </p>
+        <p>
+          We have not yet run the frozen detector on a large sample of real games. The capture
+          pipeline works, but reliable unattended play across many games and fresh installs is a
+          separate build still in progress. So the real-data effect sizes (H2 rescue, H3 the squeeze
+          near the record, H4 lethal rate), the differences between server-assigned arms (H7), and the
+          ad-value-timed revive (H8) are described here as mechanisms found in the code, not yet
+          quantified in the wild. The "higher score under the real dealer" result is our
+          reimplementation with chosen parameters, not a measurement of the live game. And everything
+          was Android, Classic mode, on an emulator with no ad history — a different population from a
+          phone in a real pocket.
+        </p>
+        <p>
+          What is solid: the mechanism is in the code, under its own names; the detector is validated
+          on known generators (zero false positives on fair dealers) and frozen before it ever touches
+          real data; and in every reimplementation we can run, the three pieces are not a fair shuffle.
+        </p>
+      </section>
+
+      <section className="chapter closing">
+        <h2>Method, in one paragraph</h2>
+        <p>
+          Every number here is reproducible. The rules engine, the generator zoo, the detector and the
+          essay demos are one TypeScript codebase; the statistical method — eight pre-registered tests,
+          Holm-corrected at &alpha; = 0.01 — was committed and tagged (<code>prereg-v1</code>)
+          <em>before</em> it was pointed at any real data, and it passes a synthetic validation that
+          flags every rigged generator and never a fair one. Each figure regenerates from a script
+          named in its caption. The full method is <code>docs/research/06-methods.md</code>; the
+          white-box findings are <code>docs/findings/</code>.
+        </p>
+      </section>
+
+      <section className="chapter closing">
+        <h2>Credits and right of reply</h2>
+        <p>
+          This replicates and quantifies the October 2026 teardown by Ayo Omolewa ("Ayoships"), which
+          first opened the app and named the lethal algorithm; we treated its claims as hypotheses and
+          verified them from our own copy. It stands on open-source clones, solvers and board-readers,
+          and on the DDA literature above. Nothing here publishes a key, a decrypted bundle, the APK,
+          or any step that would let someone repackage the game. Before publishing we would put these
+          findings to Hungry Studio and carry their response, or note the date we asked and heard
+          nothing.
+        </p>
+      </section>
+
+      <footer className="site-foot">
+        <p>An independent, reproducible analysis. Methods and aggregate results are public; the key, the decrypted scripts and the APK are not.</p>
+      </footer>
     </main>
   );
 }
