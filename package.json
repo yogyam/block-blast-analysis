@@ -1,0 +1,17 @@
+{
+  "name": "blockblast-analysis",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Reverse engineering and statistical analysis of Block Blast's piece generator",
+  "packageManager": "pnpm@10.28.0",
+  "scripts": {
+    "test": "pnpm -r test",
+    "build": "pnpm -r build",
+    "typecheck": "pnpm -r typecheck"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.5",
+    "typescript": "^5.9.3",
+    "vitest": "^3.2.7"
+  }
+}

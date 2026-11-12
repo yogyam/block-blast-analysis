@@ -1,0 +1,26 @@
+{
+  "name": "@blockblast/engine",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Pure Block Blast! game rules: bitboard, shape table, solvability oracle, fair-dealer null probabilities, simulation loop. Zero runtime dependencies; runs in Node and the browser.",
+  "license": "MIT",
+  "type": "module",
+  "sideEffects": false,
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.check.json",
+    "test": "vitest run",
+    "bench": "node --experimental-strip-types --no-warnings bench/bench.ts"
+  }
+}

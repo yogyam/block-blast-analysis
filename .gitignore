@@ -1,0 +1,27 @@
+node_modules/
+dist/
+.turbo/
+coverage/
+.DS_Store
+.env
+.env.*
+
+# Never commit app binaries, decrypted material, or keys
+*.apk
+*.xapk
+*.apks
+*.apkm
+*.ipa
+*.jsc
+*.so
+decrypted/
+extracted/
+keys/
+*.key
+
+# Raw logs are large and may contain install identifiers
+data/real/
+data/raw/
+*.jsonl
+*.parquet
+!data/**/README.md
