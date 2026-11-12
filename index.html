@@ -47,6 +47,7 @@
   h1 { font-family: var(--serif); font-weight: 700; font-size: clamp(34px, 7vw, 54px); line-height: 1.04; letter-spacing: -0.015em; margin: 0 0 16px; text-wrap: balance; }
   .dek { font-size: 20px; color: var(--muted); margin: 0; }
   .byline { font-family: var(--mono); font-size: 13px; color: var(--muted); margin: 22px 0 0; }
+  .byline .author { color: var(--fg); font-weight: 500; }
 
   h2 { font-family: var(--serif); font-weight: 600; font-size: clamp(23px, 4vw, 30px); line-height: 1.15; letter-spacing: -0.01em; margin: 52px 0 14px; text-wrap: balance; }
   p { margin: 0 0 18px; }
@@ -100,10 +101,9 @@
 
 <div class="wrap">
   <header class="hero">
-    <p class="eyebrow">A reverse-engineering teardown</p>
     <h1>Is Block&nbsp;Blast rigged?</h1>
     <p class="dek">I took apart one of the most-downloaded games in the world to find out who is really choosing your pieces. The short answer: it is not a fair shuffle.</p>
-    <p class="byline">~8 min read · all code open source</p>
+    <p class="byline">Written by <span class="author">Yogya Mehrotra</span> · ~8 min read · all code open source</p>
   </header>
 
   <p>You are one move from clearing a row. There is an obvious gap in the board. The game hands you three shapes, and not one of them fits. If you have played Block Blast, you have felt this, and you have probably muttered that there is no way it is random. A lot of people have. The company has never said anything about it. So I checked properly.</p>
