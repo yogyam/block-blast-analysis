@@ -56,7 +56,15 @@
   code { font-family: var(--mono); font-size: 0.86em; background: color-mix(in oklab, var(--fg) 7%, transparent); padding: 1px 6px; border-radius: 5px; }
 
   figure { margin: 26px 0; }
-  figure svg { width: 100%; height: auto; display: block; }
+  .boardfig { margin: 30px 0; }
+  .bf-grid { display: grid; grid-template-columns: 1.08fr 1fr; gap: 14px; align-items: stretch; }
+  @media (max-width: 460px) { .bf-grid { grid-template-columns: 1fr; } }
+  .bf-item { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 15px 16px; display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+  .bf-label { font-family: var(--mono); font-size: 11.5px; letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); }
+  .bf-svg { width: 100%; height: auto; display: block; margin-block: auto; }
+  .bf-svg .c-on { fill: var(--accent); }
+  .bf-svg .c-off { fill: color-mix(in oklab, var(--fg) 8%, transparent); }
+  .bf-cap { font-family: var(--mono); font-size: 13px; color: var(--muted); margin-top: 14px; }
 
   .chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 4px 0 22px; }
   .chip { font-family: var(--mono); font-size: 13px; padding: 4px 10px; border-radius: 6px; background: color-mix(in oklab, var(--fg) 6%, transparent); color: var(--muted); border: 1px solid var(--line); }
@@ -79,11 +87,6 @@
   .meter-tick { position: absolute; top: -3px; bottom: -3px; width: 2px; background: var(--fg); opacity: 0.5; left: 62%; }
   .meter-cap { margin: 12px 0 0; font-size: 13.5px; color: var(--muted); font-family: var(--mono); }
 
-  /* SVG fills via CSS so they follow the theme (var() in a fill attribute is unreliable). */
-  .boardbg { fill: var(--surface); stroke: var(--line); }
-  .c-on { fill: var(--accent); }
-  .c-off { fill: color-mix(in oklab, var(--fg) 9%, transparent); }
-  .note { fill: var(--muted); font-family: "IBM Plex Mono", monospace; font-size: 13px; }
 
   footer { margin: 56px 0 8px; padding-top: 24px; border-top: 1px solid var(--line); color: var(--muted); font-size: 15px; }
   footer a { font-weight: 500; }
@@ -105,25 +108,22 @@
 
   <p>You are one move from clearing a row. There is an obvious gap in the board. The game hands you three shapes, and not one of them fits. If you have played Block Blast, you have felt this, and you have probably muttered that there is no way it is random. A lot of people have. The company has never said anything about it. So I checked properly.</p>
 
-  <figure aria-label="A board with one gap and three pieces that do not fit it">
-    <svg viewBox="0 0 440 182" role="img">
-      <rect class="boardbg" x="0" y="1" width="180" height="180" rx="10"/>
-      <g id="cells"></g>
-      <g transform="translate(214,44)">
-        <g fill="#cf4035">
-          <rect x="0" y="0" width="30" height="30" rx="5"/><rect x="34" y="0" width="30" height="30" rx="5"/>
-          <rect x="0" y="34" width="30" height="30" rx="5"/>
-        </g>
-        <g fill="#2f74d0" transform="translate(96,0)">
-          <rect x="0" y="0" width="30" height="30" rx="5"/><rect x="34" y="0" width="30" height="30" rx="5"/><rect x="68" y="0" width="30" height="30" rx="5"/>
-        </g>
-        <g fill="#f2b134" transform="translate(96,46)">
-          <rect x="0" y="0" width="30" height="30" rx="5"/><rect x="0" y="34" width="30" height="30" rx="5"/>
-        </g>
-      </g>
-      <text class="note" x="214" y="150">one gap, three pieces,</text>
-      <text class="note" x="214" y="170">and none of them fit it.</text>
-    </svg>
+  <figure class="boardfig">
+    <div class="bf-grid">
+      <div class="bf-item">
+        <div class="bf-label">the board</div>
+        <svg id="boardSvg" class="bf-svg" viewBox="0 0 167 167" role="img" aria-label="a nearly-full board with a single empty gap"></svg>
+      </div>
+      <div class="bf-item">
+        <div class="bf-label">your three pieces</div>
+        <svg class="bf-svg" viewBox="0 0 170 74" role="img" aria-label="three pieces, none of which fit the gap">
+          <g fill="#cf4035"><rect x="6" y="15" width="20" height="20" rx="4.5"/><rect x="29" y="15" width="20" height="20" rx="4.5"/><rect x="6" y="38" width="20" height="20" rx="4.5"/></g>
+          <g fill="#2f74d0"><rect x="59" y="26" width="20" height="20" rx="4.5"/><rect x="82" y="26" width="20" height="20" rx="4.5"/><rect x="105" y="26" width="20" height="20" rx="4.5"/></g>
+          <g fill="#e8a92c"><rect x="135" y="15" width="20" height="20" rx="4.5"/><rect x="135" y="38" width="20" height="20" rx="4.5"/></g>
+        </svg>
+      </div>
+    </div>
+    <figcaption class="bf-cap">One gap in the board, and not one of the three pieces fits it.</figcaption>
   </figure>
 
   <h2>What I actually did</h2>
@@ -202,13 +202,13 @@
 <script>
   // Board illustration: 8x8, fill two rows except the last column to leave a visible gap.
   (function () {
-    var g = document.getElementById('cells');
+    var g = document.getElementById('boardSvg');
     if (!g) return;
-    var o = 9, s = 18, gap = 2, ns = 'http://www.w3.org/2000/svg';
+    var o = 1, s = 18, gap = 2, ns = 'http://www.w3.org/2000/svg';
     for (var r = 0; r < 8; r++) for (var c = 0; c < 8; c++) {
       var filled = (r === 4 || r === 5) && c < 7;
       var rect = document.createElementNS(ns, 'rect');
-      rect.setAttribute('x', o + c * (s + gap)); rect.setAttribute('y', o + r * (s + gap) + 1);
+      rect.setAttribute('x', o + c * (s + gap)); rect.setAttribute('y', o + r * (s + gap));
       rect.setAttribute('width', s); rect.setAttribute('height', s); rect.setAttribute('rx', 4);
       rect.setAttribute('class', filled ? 'c-on' : 'c-off');
       g.appendChild(rect);
